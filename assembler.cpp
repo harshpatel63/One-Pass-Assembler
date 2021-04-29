@@ -27,6 +27,7 @@ void onePassScan();
 bool isAssemblerDirective(string s);
 bool searchSymtab(string temp);
 void defineSymbol(string str, string add);
+void insertEmptySymbol(string str, node *n);
 
 int main()
 {
@@ -34,7 +35,7 @@ int main()
     //Added temporary code to print the symtab
     for(int i= 0 ; i<vSymtab.size(); i++)
     {
-        cout<<vSymtab[i].symbol<<" : "<<vSymtab[i].address<<endl;
+        cout<<vSymtab[i].symbol<<" : "<<vSymtab[i].address<<" : "<<vSymtab[i].link<<endl;
     }
     cout<<endl<<"Program ended"<<endl;
     return 0;
@@ -78,12 +79,12 @@ void onePassScan()
             col1 = line.substr(0,tabPos[0]);
             col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
             col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
+            ostringstream hexAdd;
             
             if(col1[0] == '.')
                 continue;
             else if(col1[0] != ' ')
             {
-                ostringstream hexAdd;
                 hexAdd<<hex<<loc;
                 defineSymbol(col1, hexAdd.str());
             }
@@ -107,10 +108,18 @@ void onePassScan()
                 loc+=3;
             }
 
-                //Search symtab for col3
-                // if not found -> insertSym(col3, *)
+                if(searchSymtab(col3))
+                {
                 // if found but address is * -> insert linked list
                 // if found and address is not * -> get address
+                }
+                else
+                {
+                    node *n = new node();
+                    n->notDefinedAddress = hexAdd.str();
+                    n->link = 0;
+                    insertEmptySymbol(col3, n);
+                }
         }
 
         file.close();
@@ -140,4 +149,12 @@ void defineSymbol(string str, string add)
         s.link = 0;
         vSymtab.push_back(s);
     }
+}
+void insertEmptySymbol(string str, node *n)
+{
+    symtab s;
+    s.symbol = str;
+    s.address = "*";
+    s.link = n;
+    vSymtab.push_back(s);
 }
