@@ -4,12 +4,25 @@
 #include<string>
 using namespace std;
 
+vector<string> assemblerDirectives = {"START", "END", "BYTE", "RESB", "WORD", "RESW"};
+
 void onePassScan();
+bool isAssemblerDirective(string s);
 
 int main()
 {
     onePassScan();
     return 0;
+}
+
+bool isAssemblerDirective(string s)
+{
+    for(int i = 0; i<assemblerDirectives.size(); i++)
+    {
+        if(s == assemblerDirectives[i])
+        return true;
+    }
+    return false;
 }
 
 void onePassScan()
@@ -39,7 +52,7 @@ void onePassScan()
             col1 = line.substr(0,tabPos[0]);
             col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
             col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
-            cout<<col1<<col2<<col3<<endl;
+            cout<<isAssemblerDirective(col2)<<endl;
         }
 
         file.close();
