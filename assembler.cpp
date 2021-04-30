@@ -41,6 +41,7 @@ int return_index( string temp);
 void entersymbol_column1( string temp , string value);
 void entersymbol_column3( string temp , string value);
 void search_symtab_column1(string symbol, string value);
+string searchInOptab(string s);
 
 
 bool isAssemblerDirective(string s)
@@ -239,7 +240,20 @@ void onePassScan()
             }
             else
             {
-                //searchinoptab(col2)
+                try
+                {
+                    string opcode = searchInOptab(col2);
+                }
+                catch(int x)
+                {
+                    if(x == -1)
+                    {
+                        cout<<"WARNING: The mnemonic code "<<col2<<" is not present in optab."<<endl;
+                        cout<<endl<<"Please add the opcode for the respective mnemonic code in optab.txt"<<endl;
+                        exit(1);
+                    }
+                }
+                //You can now handle opcode to concatenate with address to futher get object code.
                 loc+=3;
             }
             if (col2 == "START")
@@ -322,20 +336,21 @@ void initOptab()
         fn.close();
     }
 }
-void printOptab()
+string searchInOptab(string s)
 {
     for(int i = 0; i<vOptab.size(); i++)
     {
-        cout<<vOptab[i].mnemonic<<" : "<<vOptab[i].opcode<<endl;
+        if(vOptab[i].mnemonic == s)
+            return vOptab[i].opcode;
     }
+    throw -1;
 }
 int main()
 {
     initOptab();
 
-    // onePassScan();
+    onePassScan();
 
-    printOptab();
     
     // printsymtab();
    
