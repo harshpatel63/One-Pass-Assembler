@@ -42,6 +42,7 @@ void entersymbol_column1( string temp , string value);
 void entersymbol_column3( string temp , string value);
 void search_symtab_column1(string symbol, string value);
 string searchInOptab(string s);
+string seachInSymtabForLoc( string temp);
 
 
 bool isAssemblerDirective(string s)
@@ -182,7 +183,7 @@ void onePassScan()
 {
     int loc;
     string line, col1, col2, col3;
-    ifstream file("input1.txt");
+    ifstream file("input2.txt");
     
     if(file.is_open())
     {
@@ -192,6 +193,10 @@ void onePassScan()
         {
             
             bool firstTab = true;
+            string opcode;
+            string locFromSymtab;
+            string ObjectCode;
+
             for(int i = 0; i<line.size(); i++)
             {
                 if(line[i] == '\t' && firstTab == true)
@@ -239,27 +244,27 @@ void onePassScan()
                     loc+=3;
             }
             else
-            {
+            {  
                 try
                 {
-                    string opcode = searchInOptab(col2);
+                    opcode = searchInOptab(col2);
                 }
-                catch(int x)
-                {
+                    catch (int x)
+                    {
                     if(x == -1)
                     {
                         cout<<"WARNING: The mnemonic code "<<col2<<" is not present in optab."<<endl;
                         cout<<endl<<"Please add the opcode for the respective mnemonic code in optab.txt"<<endl;
                         exit(1);
                     }
-                }
-                //You can now handle opcode to concatenate with address to futher get object code.
+                    }
                 loc+=3;
             }
             if (col2 == "START")
             {
                 continue;
             }
+            
             
             
         
@@ -283,6 +288,12 @@ void onePassScan()
             {
              entersymbol_column3(col3 , push);
             }
+
+           locFromSymtab = seachInSymtabForLoc( col3);
+           ObjectCode = opcode + locFromSymtab;
+      
+           cout<<ObjectCode<<endl; 
+           
         }
 
         file.close();
@@ -340,10 +351,23 @@ string searchInOptab(string s)
 {
     for(int i = 0; i<vOptab.size(); i++)
     {
-        if(vOptab[i].mnemonic == s)
+        if(strcmp( vOptab[i].mnemonic.c_str() , s.c_str())==0)
+        {
             return vOptab[i].opcode;
+        }
     }
     throw -1;
+}
+string seachInSymtabForLoc( string temp)
+{
+    for( int i=0; i<vSymtab.size() ;i++)
+    {
+        if((vSymtab[i].symbol  == temp) && (vSymtab[i].address !="*"))
+        {
+            return vSymtab[i].address;
+        }
+    }
+    return "0000";
 }
 int main()
 {
