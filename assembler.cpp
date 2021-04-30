@@ -6,6 +6,12 @@
 #include<cstring>
 using namespace std;
 
+struct Optab
+{
+string mnemonic;
+string opcode;
+};
+
 struct Node
 {
     string notDefinedAddress;
@@ -24,6 +30,7 @@ struct Symtab
 vector<string> assemblerDirectives = {"START", "END", "BYTE", "RESB", "WORD", "RESW"};
 vector<Symtab> vSymtab;
 vector<string> location;
+vector<Optab> vOptab;
 
 void onePassScan();
 bool isAssemblerDirective(string s);
@@ -295,13 +302,44 @@ void printlinklist( )
         }
     }
 }
+void initOptab()
+{
+    ifstream fn("optab.txt");
+    string temp;
+    if(fn.is_open())
+    {
+        int i = 0;
+        while(fn>>temp)
+        {
+            struct Optab optab;   
+            optab.mnemonic = temp;
+            fn>>temp;
+            optab.opcode = temp;
+            vOptab.push_back(optab);
+            i++;
+            
+        }
+        fn.close();
+    }
+}
+void printOptab()
+{
+    for(int i = 0; i<vOptab.size(); i++)
+    {
+        cout<<vOptab[i].mnemonic<<" : "<<vOptab[i].opcode<<endl;
+    }
+}
 int main()
 {
-    onePassScan();
+    initOptab();
+
+    // onePassScan();
+
+    printOptab();
     
-    printsymtab();
+    // printsymtab();
    
-    printlinklist();
+    // printlinklist();
     return 0;
 }
 
