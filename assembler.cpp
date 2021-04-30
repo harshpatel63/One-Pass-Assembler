@@ -3,6 +3,7 @@
 #include<vector>
 #include<string>
 #include<sstream>
+#include<cstring>
 using namespace std;
 
 struct Node
@@ -10,7 +11,7 @@ struct Node
     string notDefinedAddress;
     struct Node *link;
 };
-typedef struct Node node;
+
 
 struct Symtab
 {
@@ -18,28 +19,22 @@ struct Symtab
     string address;
     struct Node *link;
 };
-typedef struct Symtab symtab;
+
 
 vector<string> assemblerDirectives = {"START", "END", "BYTE", "RESB", "WORD", "RESW"};
-vector<symtab> vSymtab;
+vector<Symtab> vSymtab;
+vector<string> location;
 
 void onePassScan();
 bool isAssemblerDirective(string s);
-bool searchSymtab(string temp);
-void defineSymbol(string str, string add);
-void insertEmptySymbol(string str, node *n);
+int searchSymtab(string temp);
 
-int main()
-{
-    onePassScan();
-    //Added temporary code to print the symtab
-    for(int i= 0 ; i<vSymtab.size(); i++)
-    {
-        cout<<vSymtab[i].symbol<<" : "<<vSymtab[i].address<<" : "<<vSymtab[i].link<<endl;
-    }
-    cout<<endl<<"Program ended"<<endl;
-    return 0;
-}
+void enterextra(struct Node *link , string value , int i);
+int return_index( string temp);
+void entersymbol_column1( string temp , string value);
+void entersymbol_column3( string temp , string value);
+void search_symtab_column1(string symbol, string value);
+
 
 bool isAssemblerDirective(string s)
 {
@@ -50,6 +45,130 @@ bool isAssemblerDirective(string s)
     }
     return false;
 }
+
+void enterextra(struct Node *link , string value , int i)
+{
+   if (link == NULL)
+   {  
+       struct Node *head ;
+       head = new Node();
+       head->notDefinedAddress =value;
+       head->link = NULL;
+       vSymtab[i].link = head;
+       
+   }
+   else
+   {   
+       struct Node *temp = NULL;
+       struct Node *newentry = NULL;
+       
+       temp = link;
+      
+       while (temp->link != NULL)
+       {   
+        temp = temp->link;
+       }
+      
+       newentry = new Node();
+       newentry->notDefinedAddress = value;
+       newentry->link = NULL;
+       temp->link = newentry;
+   }
+   
+}
+
+int searchSymtab( string temp)
+{    
+    int found = 0;
+
+    for (int i = 0; i < vSymtab.size(); i++)
+    {
+        if(strcmp(vSymtab[i].symbol.c_str() , temp.c_str())==0)
+        {    
+           found = 1; 
+           return 1;
+        }
+    }
+    if (found == 0)
+    {
+       return 0;
+    }
+    
+}
+
+int return_index( string temp)
+{
+    for (int i = 0; i < vSymtab.size(); i++)
+    {
+        if(strcmp(vSymtab[i].symbol.c_str() , temp.c_str())==0)
+        {    
+           return i;
+        }
+    }
+}
+
+void entersymbol_column1( string temp , string value)
+{   
+    struct Symtab s;
+    s.symbol = temp;
+    s.address = value;
+    s.link = NULL;
+    vSymtab.push_back(s);
+}
+
+void entersymbol_column3( string temp , string value)
+{   
+    
+    struct Symtab s;
+    
+  
+        if(searchSymtab(temp))
+        {  
+        int i;
+        i = return_index(temp);
+        enterextra(vSymtab[i].link , value , i);
+        }
+        else
+        {  
+           int i;
+           s.symbol= temp;
+           s.address = "*";
+           s.link = NULL;
+           vSymtab.push_back(s);
+           i = return_index(temp);
+           enterextra( s.link , value , i);
+          }
+}
+ 
+void search_symtab_column1(string symbol, string value)
+{   
+    //string c ="00";
+    //string final;
+     for (int i = 0; i < vSymtab.size(); i++)
+    {
+        if(strcmp(vSymtab[i].symbol.c_str() , symbol.c_str())==0)
+        {    
+            if( vSymtab[i].address == "*")
+            {
+                 struct Node *temp;
+                 struct Node *next;
+                 temp = vSymtab[i].link;
+                 while (temp != NULL)
+                 {  
+                   // final = strcat( c , temp->opcode.c_str()) ;
+                    cout<<"T"<<"^"<<temp->notDefinedAddress<<"^"<<value<<endl;
+                    next= temp->link;
+                    free(temp);
+                    temp = next;
+                 }
+                 
+                 vSymtab.erase( vSymtab.begin() + i);
+                 entersymbol_column1(symbol , value);
+                 
+            }
+        }
+    }
+} 
 
 void onePassScan()
 {
@@ -79,26 +198,35 @@ void onePassScan()
             col1 = line.substr(0,tabPos[0]);
             col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
             col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
-            ostringstream hexAdd;
             
-            if(col1[0] == '.')
-                continue;
-            else if(col1[0] != ' ')
+            ostringstream hexAdd;
+            hexAdd<<hex<<loc;
+            string push = hexAdd.str();
+            if ( col2 != "START")
             {
-                hexAdd<<hex<<loc;
-                defineSymbol(col1, hexAdd.str());
+                location.push_back(push);
             }
+               
+
 
             if(isAssemblerDirective(col2))
             {
                 if(col2 == "START")
-                    loc = atoi(col3.c_str());
-                else if(col2 == "BYTE")
+                    istringstream(col3)>>hex>>loc;
+                else if(col2 == "BYTE")//Will have to handle C'EOF' separately here. We'll do it later.
                     loc += 1;
                 else if(col2 == "RESB")
-                    loc += 1*(atoi(col3.c_str()));
+                {
+                    int temp;
+                    istringstream(col3)>>hex>>temp;
+                    loc += 1*temp;
+                }
                 else if(col2 == "RESW")
-                    loc += 3*(atoi(col3.c_str()));
+                    {
+                    int temp;
+                    istringstream(col3)>>hex>>temp;
+                    loc += 3*temp;
+                }
                 else
                     loc+=3;
             }
@@ -107,54 +235,73 @@ void onePassScan()
                 //searchinoptab(col2)
                 loc+=3;
             }
+            if (col2 == "START")
+            {
+                continue;
+            }
+            
+            
+        
+            
+            if(col1[0] == '.')
+                continue;
+            else if(col1[0] != ' ')
+            { 
+                 if (searchSymtab(col1))
+                 {  
+                    search_symtab_column1( col1 , push);
+                 }
+                 else
+                 {
+                     entersymbol_column1( col1 , push);
+                 }
+                 
+            }
 
-                if(searchSymtab(col3))
-                {
-                // if found but address is * -> insert linked list
-                // if found and address is not * -> get address
-                }
-                else
-                {
-                    node *n = new node();
-                    n->notDefinedAddress = hexAdd.str();
-                    n->link = 0;
-                    insertEmptySymbol(col3, n);
-                }
+            if(!isAssemblerDirective(col2)) //It was col2 != "START" before
+            {
+             entersymbol_column3(col3 , push);
+            }
         }
 
         file.close();
     }
 }
+void printsymtab()
+{
+    for (int i = 0; i < vSymtab.size(); i++)
+    {
+        cout<<vSymtab[i].symbol<<" ";
+        cout<<vSymtab[i].address<<endl;
+    }
+    
+}
 
-bool searchSymtab(string temp)
+void printlinklist( )
 {
-    for(int i = 0; i<vSymtab.size(); i++)
+    for(int i =0 ; i < vSymtab.size() ; i++)
     {
-        if(temp == vSymtab[i].symbol)
-            return true;
-    }
-    return false;
-}
-void defineSymbol(string str, string add)
-{
-    if(searchSymtab(str))
-    {
-        //Delete linked list, respective object code to be generated and store the original address...
-    }
-    else
-    {
-        symtab s;
-        s.symbol = str;
-        s.address = add;
-        s.link = 0;
-        vSymtab.push_back(s);
+        if(vSymtab[i].address == "*")
+        {   
+            cout<<"\n link list for"<<vSymtab[i].symbol;
+            struct Node *temp;
+            temp = vSymtab[i].link;
+            while (temp != NULL)
+            {
+                cout<<temp->notDefinedAddress<<" ";
+                temp = temp->link;
+            }
+            
+        }
     }
 }
-void insertEmptySymbol(string str, node *n)
+int main()
 {
-    symtab s;
-    s.symbol = str;
-    s.address = "*";
-    s.link = n;
-    vSymtab.push_back(s);
+    onePassScan();
+    
+    printsymtab();
+   
+    printlinklist();
+    return 0;
 }
+
