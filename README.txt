@@ -2,19 +2,23 @@
                                                                    
                                                                         GROUP NUMBER    :- 4
 
-                                                                      NAME OF MEMBER    :- 1.) Harsh patel     (19CSE1019)
-                                                                                          2.) Roshan kumar (19CSE1027)
+                                                                      NAME OF MEMBER    :- 1.) Roshan Kumar (19CSE1027)
+                                                                                           2.) Patel Harsh Rajesh (19CSE1019)
 
-                                                                        SUPERVISOR      :- Dr. Veena Thenkanidiyoor
+                                                                          SUPERVISOR    :- Dr. Veena Thenkanidiyoor
  
-                                                                          DATE          :- MAY 1, 2021
+                                                                                DATE    :- May 1, 2021
 
-                                                                       DEPARTMENT       :-Computer Science and Engineeing
+                                                                          DEPARTMENT    :- Computer Science and Engineeing
 
 
 Hello welcome to one pass assembler.
-In this program we are are taking a input program and generating corresponding object program for it.
+
+In this program we are are taking an input program and generating corresponding object program for it.
+
 This program was written in C++14 standard and compiled using MINGW64(G++) compiler.
+
+HOW TO RUN :-
 
       To run this program go to the  One-Pass-Assembler file directory and write the following
 
@@ -23,15 +27,24 @@ This program was written in C++14 standard and compiled using MINGW64(G++) compi
       If input file name is not given in the command line then by default the program considers "input1.txt" as  the file name.
 
       The welcome screen will ask to enter any key to continue
+      
+ASSUMPTIONS:-
 
 Input1.txt file is written in three columns . The 1st column contains all the labels.
-            If a label is not present in the column1 then a combination of one tab and space is used and then column2 is written.
             
             In general column1 is followed by a tab and then column2 is written and after column2 there is a tab and then column3 
             is written
+            
+            <column1><tab><column2><tab><column3>
+            
+            If a label is not present in the column1 then a combination of one tab and space is used and then column2 is written.
+            
+            <space><tab><column2><tab><column3>
+           
             Before the changes are made in the input file this combination should be considered , otherwise error will be generated in 
-            object program
-
+            object program.
+            
+EXPLANATION:-
 
 Input1.txt file contains a source code. Ths source code is for a program that reads records from a input device and copies them to an output device. The main routine calls subroutine RDREC to read the records from input device and WRREC to write the records in the output device.
 
@@ -69,7 +82,7 @@ The vOptab reads the optab.txt and stores it.
 Structure Optab has the following data member
 
 1.) menmonic :- It store mnemonic
-2.) opcode      :- It stores the opcode corresponding to a mnemonic
+2.) opcode   :- It stores the opcode corresponding to a mnemonic
 
 
 
@@ -105,17 +118,5 @@ Then the program checks if the column2 contains assembler directives. According 
 
 After all this the object code is generated and stored in a ostringstream , and this object code is further put in textrecord and hence a
 full object program is generated.
-
-REFERENCE :- 1.) geeksforgeeks.org
-                        2.) stackoverflow.com
-                        3.) cplusplus.com
-                        4.) programiz.com
-                        5.) codegrepper.com 
-                        6.) daniweb.com
  
-
-
-
-
-
 
