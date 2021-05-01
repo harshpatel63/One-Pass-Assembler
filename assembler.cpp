@@ -4,6 +4,8 @@
 #include<string>
 #include<sstream>
 #include<cstring>
+#include<iomanip>
+#include<algorithm>
 using namespace std;
 
 struct Optab
@@ -41,7 +43,6 @@ string name;
 ostringstream lineObjProg;
 ostringstream preLineObjProg;
 int lineStartAddress;
-int lineEndAddress;
 int objCodeCounter = 0;
 
 void onePassScan();
@@ -62,7 +63,9 @@ void moveToNextLine()
     //Optimization possible by removing lineObjProg
     if(preLineObjProg.str() == "")
     return;
-    lineObjProg<<"T^00"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
+    string temp5 = preLineObjProg.str();
+    int s = temp5.size()/7;
+    lineObjProg<<"T^"<<setfill('0')<<setw(6)<<hex<<lineStartAddress<<"^"<<setfill('0')<<setw(2)<<hex<<s*3;
     lineObjProg<<preLineObjProg.str()<<"\n";
     preLineObjProg.str("");
     preLineObjProg.clear();
@@ -184,9 +187,6 @@ void search_symtab_column1(string symbol, string value)
         {    
             if( vSymtab[i].address == "*")
             {
-                int temp1;
-                istringstream(value)>>hex>>temp1;
-                lineEndAddress = temp1-3;
                 moveToNextLine();
                  struct Node *temp;
                  struct Node *next;
@@ -299,7 +299,6 @@ void onePassScan()
                 }
                 else if(col2 == "END")
                     {
-                        lineEndAddress = loc;
                         moveToNextLine();
                         loc+=3;
                         endingAddress = loc-3;
@@ -333,7 +332,6 @@ void onePassScan()
                 loc+=3;
                 if(afterAssemDir)
                 {
-                    lineEndAddress = loc;
                     moveToNextLine();
                     afterAssemDir = false;
                 }
@@ -391,7 +389,6 @@ void onePassScan()
             }
             if(objCodeCounter == 10)
                 {
-                    lineEndAddress = loc;
                     moveToNextLine();
                 }
         }
@@ -507,7 +504,9 @@ int main()
     initOptab();
 
     onePassScan();
-    cout<<objectProgram.str();
+    string final = objectProgram.str();
+    transform(final.begin(),final.end(),final.begin(), ::toupper);
+    cout<<final;
     // printlinklist();
     return 0;
 }
