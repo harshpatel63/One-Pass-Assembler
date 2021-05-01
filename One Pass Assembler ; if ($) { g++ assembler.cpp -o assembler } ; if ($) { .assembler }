@@ -1,0 +1,89 @@
+[33mcommit e25ce3b684b77e0746d0b7297e61334d6393bc5f[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Sat May 1 11:35:48 2021 +0530
+
+    Handled index addressing and fixed bug for comment lines
+
+[33mcommit d1b457b36684508f07a38121034a04ed7e6e70fa[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Sat May 1 11:21:59 2021 +0530
+
+    Added functionality to print object code of assembler directive if it generates
+
+[33mcommit 7680b2a90603e001d5cc084b0a29064f88b4e27c[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: roscode02 <roshank0210@gmail.com>
+Date:   Fri Apr 30 18:24:57 2021 +0530
+
+    generated object code in function onepass()
+
+[33mcommit 4bdb0dd2de746f1f569f9589bc81bcb08b2dca78[m
+Author: roscode02 <roshank0210@gmail.com>
+Date:   Fri Apr 30 15:37:01 2021 +0530
+
+    intial commit
+
+[33mcommit 23506ea48263a3675029b8510e9f6be38369fd55[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Fri Apr 30 15:29:56 2021 +0530
+
+    Added functionality to search in optab and also handled the error if corresponding opcode not found
+
+[33mcommit 03b31046b0205cc308181e544b4dd93126155164[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Fri Apr 30 15:19:32 2021 +0530
+
+    Added the functionality to get the opcodes from optab and print each opcode
+
+[33mcommit f014db885ae17445038c0ec88b342e17cf0930b3[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Fri Apr 30 15:05:24 2021 +0530
+
+    Added functionality of to handle symtab
+
+[33mcommit 483c039482b0fe9aee03a74a237f2cbd19bc3bea[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Fri Apr 30 11:21:38 2021 +0530
+
+    Added the optab.txt file
+
+[33mcommit 4ff6e23fd72344a5ef20d15ecfc031c7ea0f073a[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Thu Apr 29 23:57:33 2021 +0530
+
+    Added more logic and functionality to symtab
+
+[33mcommit 8fbd9df764882d9bcf6bbac77adc26877227ae8d[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Thu Apr 29 23:35:16 2021 +0530
+
+    Basic implementation of symtab
+
+[33mcommit 597a6db6e51d3f0bd03500131bf5c79b642c1f06[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Thu Apr 29 22:49:22 2021 +0530
+
+    Added function to check the column 2 is an assembler directive or not
+
+[33mcommit c6edb81ba1e9523b9407a9b10d07ed9a65892e85[m
+Author: Harsh Patel <76950584+Sci3fic@users.noreply.github.com>
+Date:   Thu Apr 29 22:40:58 2021 +0530
+
+    assembler.exe file not required.
+
+[33mcommit 581077a794bde18bf503dd2c4b739a4be80ed06c[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Thu Apr 29 22:39:14 2021 +0530
+
+    Added the function to get the column from line of input1
+
+[33mcommit 135b5755ea12d1d03868e17d28a0a0a489977d64[m
+Author: roscode02 <roshank0210@gmail.com>
+Date:   Wed Apr 28 18:59:07 2021 +0530
+
+    first commit
+
+[33mcommit 112735c52ea2d3fccbaaa82cbf9e65c5e03ff56e[m
+Author: Harsh <patelharsh0603@gmail.com>
+Date:   Tue Apr 27 21:57:18 2021 +0530
+
+    Initial commit

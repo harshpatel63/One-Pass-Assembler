@@ -31,6 +31,11 @@ vector<string> assemblerDirectives = {"START", "END", "BYTE", "RESB", "WORD", "R
 vector<Symtab> vSymtab;
 vector<string> location;
 vector<Optab> vOptab;
+ostringstream objectProgram;
+ostringstream preObjectProgram;
+int startingAddress;
+int endingAddress;
+string name;
 
 void onePassScan();
 bool isAssemblerDirective(string s);
@@ -192,14 +197,13 @@ void onePassScan()
         int tabPos[2];
         while(getline(file, line))
         {
-            
+            if(line[0] == '.')
+                continue;
             bool firstTab = true;
             bool isIndexAdd =false;
             string opcode;
             string locFromSymtab;
             string ObjectCode;
-            if(line[0] == '.')
-                continue;
 
             for(int i = 0; i<line.size(); i++)
             {
@@ -229,10 +233,23 @@ void onePassScan()
             if(isAssemblerDirective(col2))
             {
                 if(col2 == "START")
-                    istringstream(col3)>>hex>>loc;
-                else if(col2 == "BYTE")//Will have to handle C'EOF' separately here. We'll do it later.
+                    {
+                        istringstream(col3)>>hex>>loc;
+                        for(int i = col1.size();i<6;i++)
+                        {
+                            //Optimization possible...
+                            col1.append(" ");
+                        }
+                        name = col1;
+                        startingAddress = loc;
+                        continue;
+                    }
+                else if(col2 == "BYTE")
                 {
-                    loc += 3;
+                    if(col3[0] == 'C')
+                        loc += 3;
+                    else
+                        loc += 1;
                     string objCodeForByte = returnObjectCodeForAD(col2, col3);
                     cout<<objCodeForByte<<endl;
                 }
@@ -254,6 +271,11 @@ void onePassScan()
                     string objCodeForWord = returnObjectCodeForAD(col2, col3);
                     cout<<objCodeForWord<<endl;
                 }
+                else if(col2 == "END")
+                    {
+                        loc+=3;
+                        endingAddress = loc;
+                    }
                 else
                     loc+=3;
             }
@@ -273,10 +295,6 @@ void onePassScan()
                     }
                     }
                 loc+=3;
-            }
-            if (col2 == "START")
-            {
-                continue;
             }
             
             
@@ -432,10 +450,6 @@ int main()
     initOptab();
 
     onePassScan();
-
-    
-    // printsymtab();
-   
     // printlinklist();
     return 0;
 }
