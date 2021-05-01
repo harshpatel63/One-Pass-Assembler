@@ -1,15 +1,15 @@
-                                                                        PROJECT NAME      :- ONE PASS ASSEMBLER
+                                                                        PROJECT NAME    :- ONE PASS ASSEMBLER
                                                                    
                                                                         GROUP NUMBER    :- 4
 
-                                                            NAME OF MEMBER            :- 1.) Harsh patel     (19CSE1019)
-                                                                                                           2.) Roshan kumar (19CSE1027)
+                                                                      NAME OF MEMBER    :- 1.) Harsh patel     (19CSE1019)
+                                                                                          2.) Roshan kumar (19CSE1027)
 
-                                                                        SUPERVISOR          :- Dr. Veena Thenkanidiyoor
+                                                                        SUPERVISOR      :- Dr. Veena Thenkanidiyoor
  
-                                                                                     DATE          :- MAY 1, 2021
+                                                                          DATE          :- MAY 1, 2021
 
-                                                               DEPARTMENT                  :- Department of Computer Science 
+                                                                       DEPARTMENT       :-Computer Science and Engineeing
 
 
 Hello welcome to one pass assembler.
