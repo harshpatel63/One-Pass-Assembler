@@ -57,6 +57,7 @@ void search_symtab_column1(string symbol, string value);
 string searchInOptab(string s);
 string seachInSymtabForLoc( string temp);
 string returnObjectCodeForAD(string str1, string str2);
+string filename;
 
 void moveToNextLine()
 {
@@ -211,7 +212,7 @@ void onePassScan()
 {
     int loc;
     string line, col1, col2, col3;
-    ifstream file("input1.txt");
+    ifstream file(filename);
     bool afterAssemDir = false;
     
     if(file.is_open())
@@ -499,8 +500,19 @@ string returnObjectCodeForAD(string str1, string str2)
     }
     return "000000";
 }
-int main()
+int main(int argc, char *argv[])
 {
+
+    if(argc == 2)
+    {
+        filename = argv[1];
+    }
+    else
+    {
+        cout<<endl<<"Your filename is not proper... Running the default file input1.txt\n"<<endl;
+        filename = "input1.txt";
+    }
+
     initOptab();
 
     onePassScan();
