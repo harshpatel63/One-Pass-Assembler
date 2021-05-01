@@ -194,9 +194,12 @@ void onePassScan()
         {
             
             bool firstTab = true;
+            bool isIndexAdd =false;
             string opcode;
             string locFromSymtab;
             string ObjectCode;
+            if(line[0] == '.')
+                continue;
 
             for(int i = 0; i<line.size(); i++)
             {
@@ -280,9 +283,7 @@ void onePassScan()
             
         
             
-            if(col1[0] == '.')
-                continue;
-            else if(col1[0] != ' ')
+            if(col1[0] != ' ')
             { 
                  if (searchSymtab(col1))
                  {  
@@ -297,9 +298,30 @@ void onePassScan()
 
             if(!isAssemblerDirective(col2)) //It was col2 != "START" before
             {
-                entersymbol_column3(col3 , push);
+                if(col3[col3.size()-1] == 'X' && col3[col3.size()-2] == ',')
+                {
+                    col3 = col3.substr(0,col3.size()-2);//BUFFER,X changes to BUFFER
+                    isIndexAdd = true;
+                }
+                int temp;
+                istringstream(push)>>hex>>temp;
+                temp+=1;
+                ostringstream t;
+                t<<hex<<temp;
+                entersymbol_column3(col3 , t.str());
                 locFromSymtab = seachInSymtabForLoc(col3);
-                ObjectCode = opcode + locFromSymtab;
+                if (isIndexAdd)
+                {
+                    //Handling index addressing location incrementation
+                    ostringstream s;
+                    int temp;
+                    istringstream(locFromSymtab)>>hex>>temp;
+                    temp *= 9;
+                    s<<hex<<temp;
+                    ObjectCode = opcode + s.str();
+                }
+                else
+                    ObjectCode = opcode + locFromSymtab;
                 cout<<ObjectCode<<endl;
             }
         }
