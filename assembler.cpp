@@ -242,16 +242,30 @@ void onePassScan()
             }
 
             col1 = line.substr(0,tabPos[0]);
-            col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
-            col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
-            
+            string lineReverse = line;
+            reverse(lineReverse.begin(),lineReverse.end());
             ostringstream hexAdd;
             hexAdd<<hex<<loc;
             string push = hexAdd.str();
             if ( col2 != "START")
-            {
                 location.push_back(push);
+            if(lineReverse.substr(0,4) == "BUSR")
+            {
+                loc+=3;
+                opcode = searchInOptab("RSUB");
+                ObjectCode = opcode + "0000";
+                preLineObjProg<<"^"<<ObjectCode;
+                if(objCodeCounter == 0)
+                    lineStartAddress = loc-3;
+                objCodeCounter++;
+                if(objCodeCounter == 10)
+                    moveToNextLine();
+                continue;
             }
+            col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
+            col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
+            
+            
                
 
 
@@ -509,7 +523,7 @@ void printSplashScreen()
     cout<<"\t\t\t\tGroup No.: 4"<<endl;
     cout<<"\t\t\t\t1. Roshan Kumar - 19CSE1027"<<endl;
     cout<<"\t\t\t\t2. Patel Harsh Rajesh - 19CSE1019"<<endl;
-    cout<<"\t\t\t\tEnter Enter key to continue..."<<endl;
+    cout<<"\n\n\n\n\t\t\t\tPress Enter key to continue..."<<endl;
     cin.ignore();
     system("CLS");
 }
@@ -520,7 +534,7 @@ void printMainScreen()
     cout<<"\n\n\n\n\t\t\t\t1. Print the object program to screen"<<endl;
     cout<<"\t\t\t\t2. Store the object program into output.txt in the same directory"<<endl;
     cout<<"\t\t\t\t3. Print the object program to screen and also generate an output.txt file"<<endl;
-    cout<<"\n\n\n\n\t\t\t\tNote : The screen output will contain ^ characters for better readability while the output file will not."<<endl;
+    cout<<"\n\n\n\n\t\t\t\tNote : The screen output will contain ^ characters for better readability\n\t\t\t\t while the output file will not."<<endl;
     cin>>option;
     string final = objectProgram.str();
     transform(final.begin(),final.end(),final.begin(), ::toupper);
