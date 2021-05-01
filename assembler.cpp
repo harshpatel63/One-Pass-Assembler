@@ -4,6 +4,8 @@
 #include<string>
 #include<sstream>
 #include<cstring>
+#include<iomanip>
+#include<algorithm>
 using namespace std;
 
 struct Optab
@@ -41,7 +43,6 @@ string name;
 ostringstream lineObjProg;
 ostringstream preLineObjProg;
 int lineStartAddress;
-int lineEndAddress;
 int objCodeCounter = 0;
 
 void onePassScan();
@@ -56,13 +57,17 @@ void search_symtab_column1(string symbol, string value);
 string searchInOptab(string s);
 string seachInSymtabForLoc( string temp);
 string returnObjectCodeForAD(string str1, string str2);
+string filename;
 
 void moveToNextLine()
 {
     //Optimization possible by removing lineObjProg
     if(preLineObjProg.str() == "")
     return;
-    lineObjProg<<"T^00"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
+    string temp5 = preLineObjProg.str();
+    temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+    int s = temp5.size()/2;
+    lineObjProg<<"T^"<<setfill('0')<<setw(6)<<hex<<lineStartAddress<<"^"<<setfill('0')<<setw(2)<<hex<<s;
     lineObjProg<<preLineObjProg.str()<<"\n";
     preLineObjProg.str("");
     preLineObjProg.clear();
@@ -184,9 +189,6 @@ void search_symtab_column1(string symbol, string value)
         {    
             if( vSymtab[i].address == "*")
             {
-                int temp1;
-                istringstream(value)>>hex>>temp1;
-                lineEndAddress = temp1-3;
                 moveToNextLine();
                  struct Node *temp;
                  struct Node *next;
@@ -211,7 +213,7 @@ void onePassScan()
 {
     int loc;
     string line, col1, col2, col3;
-    ifstream file("input1.txt");
+    ifstream file(filename);
     bool afterAssemDir = false;
     
     if(file.is_open())
@@ -240,16 +242,30 @@ void onePassScan()
             }
 
             col1 = line.substr(0,tabPos[0]);
-            col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
-            col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
-            
+            string lineReverse = line;
+            reverse(lineReverse.begin(),lineReverse.end());
             ostringstream hexAdd;
             hexAdd<<hex<<loc;
             string push = hexAdd.str();
             if ( col2 != "START")
-            {
                 location.push_back(push);
+            if(lineReverse.substr(0,4) == "BUSR")
+            {
+                loc+=3;
+                opcode = searchInOptab("RSUB");
+                ObjectCode = opcode + "0000";
+                preLineObjProg<<"^"<<ObjectCode;
+                if(objCodeCounter == 0)
+                    lineStartAddress = loc-3;
+                objCodeCounter++;
+                if(objCodeCounter == 10)
+                    moveToNextLine();
+                continue;
             }
+            col2 = line.substr(tabPos[0] + 1, tabPos[1] - tabPos[0] - 1);
+            col3 = line.substr(tabPos[1] + 1, line.size() - tabPos[1]);
+            
+            
                
 
 
@@ -299,7 +315,6 @@ void onePassScan()
                 }
                 else if(col2 == "END")
                     {
-                        lineEndAddress = loc;
                         moveToNextLine();
                         loc+=3;
                         endingAddress = loc-3;
@@ -333,7 +348,6 @@ void onePassScan()
                 loc+=3;
                 if(afterAssemDir)
                 {
-                    lineEndAddress = loc;
                     moveToNextLine();
                     afterAssemDir = false;
                 }
@@ -391,7 +405,6 @@ void onePassScan()
             }
             if(objCodeCounter == 10)
                 {
-                    lineEndAddress = loc;
                     moveToNextLine();
                 }
         }
@@ -502,12 +515,96 @@ string returnObjectCodeForAD(string str1, string str2)
     }
     return "000000";
 }
-int main()
+void printSplashScreen()
 {
+    cout<<"\n\n\n\n\t\t\t\tNational Institute of Technology Goa"<<endl;
+    cout<<"\n\n\n\n\t\t\t\tOne Pass Assembler that generates object program\n\n"<<endl;
+    cout<<"\t\t\t\tCode by:\n"<<endl;
+    cout<<"\t\t\t\tGroup No.: 4"<<endl;
+    cout<<"\t\t\t\t1. Roshan Kumar - 19CSE1027"<<endl;
+    cout<<"\t\t\t\t2. Patel Harsh Rajesh - 19CSE1019"<<endl;
+    cout<<"\n\n\n\n\t\t\t\tPress Enter key to continue..."<<endl;
+    cin.ignore();
+    system("CLS");
+}
+void printMainScreen()
+{
+    int option;
+    cout<<"\n\n\n\n\t\t\t\tEnter the desired option to get the output."<<endl;
+    cout<<"\n\n\n\n\t\t\t\t1. Print the object program to screen"<<endl;
+    cout<<"\t\t\t\t2. Store the object program into output.txt in the same directory"<<endl;
+    cout<<"\t\t\t\t3. Print the object program to screen and also generate an output.txt file"<<endl;
+    cout<<"\n\n\n\n\t\t\t\tNote : The screen output will contain ^ characters for better readability\n\t\t\t\t while the output file will not."<<endl;
+    cin>>option;
+    string final = objectProgram.str();
+    transform(final.begin(),final.end(),final.begin(), ::toupper);
+    fstream outputFile;
+    string temp5 = final;
+    switch(option)
+    {
+        case 1:
+            cout<<endl<<final<<endl;
+            cin.get();
+        break;
+        case 2:
+            outputFile.open("output.txt",ios::out);
+            if(!outputFile)
+            {
+                cout<<"File creation failed. Press enter to return to Main Screen"<<endl;
+                cin.ignore();
+                printMainScreen();
+            }
+            else
+            {
+                temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+                outputFile<<temp5;
+                cout<<"File with object program successfully created..."<<endl;
+                cin.get();
+            }
+        break;
+        case 3:
+            outputFile.open("output.txt",ios::out);
+            if(!outputFile)
+            {
+                cout<<"File creation failed.\n"<<endl;
+            }
+            else
+            {
+                temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+                outputFile<<temp5;
+                cout<<"\nFile with object program successfully created...\n"<<endl;
+            }
+            cout<<endl<<final<<endl;
+            cin.get();
+        break;
+        default:
+            cout<<"\n\n\n\n\t\t\t\tThe Option selected does not exist. Press Enter to re-enter.\n\n"<<endl;
+            cin.ignore();
+            system("CLS");
+            printMainScreen();
+        break;
+    }
+}
+int main(int argc, char *argv[])
+{
+    printSplashScreen();
+
+    if(argc == 2)
+    {
+        filename = argv[1];
+    }
+    else
+    {
+        cout<<endl<<"Your filename is not proper... Running the default file input1.txt\n"<<endl;
+        filename = "input1.txt";
+    }
+
     initOptab();
 
     onePassScan();
-    cout<<objectProgram.str();
-    // printlinklist();
+
+    printMainScreen();
+
+    cin.get();
     return 0;
 }
