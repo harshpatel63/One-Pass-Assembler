@@ -62,7 +62,7 @@ void moveToNextLine()
     //Optimization possible by removing lineObjProg
     if(preLineObjProg.str() == "")
     return;
-    lineObjProg<<"T^"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
+    lineObjProg<<"T^00"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
     lineObjProg<<preLineObjProg.str()<<"\n";
     preLineObjProg.str("");
     preLineObjProg.clear();
@@ -193,7 +193,7 @@ void search_symtab_column1(string symbol, string value)
                  temp = vSymtab[i].link;
                  while (temp != NULL)
                  {  
-                    preObjectProgram<<"T"<<"^"<<temp->notDefinedAddress<<"^02^"<<value<<endl;
+                    preObjectProgram<<"T"<<"^00"<<temp->notDefinedAddress<<"^02^"<<value<<endl;
                     next= temp->link;
                     free(temp);
                     temp = next;
@@ -303,9 +303,9 @@ void onePassScan()
                         moveToNextLine();
                         loc+=3;
                         endingAddress = loc-3;
-                        objectProgram<<"H^"<<name<<"^"<<hex<<startingAddress<<"^"<<hex<<endingAddress-startingAddress<<endl;
+                        objectProgram<<"H^"<<name<<"^00"<<hex<<startingAddress<<"^00"<<hex<<endingAddress-startingAddress<<endl;
                         objectProgram<<preObjectProgram.str();
-                        objectProgram<<"E^"<<hex<<firstExeAdd;
+                        objectProgram<<"E^00"<<hex<<firstExeAdd;
                     }
                 else
                     loc+=3;
