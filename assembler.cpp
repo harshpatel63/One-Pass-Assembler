@@ -295,6 +295,9 @@ void onePassScan()
                 }
                 else if(col2 == "END")
                     {
+
+                        lineEndAddress = loc;
+                        moveToNextLine();
                         loc+=3;
                         endingAddress = loc-3;
                         objectProgram<<"H^"<<name<<"^"<<hex<<startingAddress<<"^"<<hex<<endingAddress-startingAddress<<endl;
@@ -500,4 +503,3 @@ int main()
     // printlinklist();
     return 0;
 }
-
