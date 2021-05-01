@@ -65,8 +65,9 @@ void moveToNextLine()
     if(preLineObjProg.str() == "")
     return;
     string temp5 = preLineObjProg.str();
-    int s = temp5.size()/7;
-    lineObjProg<<"T^"<<setfill('0')<<setw(6)<<hex<<lineStartAddress<<"^"<<setfill('0')<<setw(2)<<hex<<s*3;
+    temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+    int s = temp5.size()/2;
+    lineObjProg<<"T^"<<setfill('0')<<setw(6)<<hex<<lineStartAddress<<"^"<<setfill('0')<<setw(2)<<hex<<s;
     lineObjProg<<preLineObjProg.str()<<"\n";
     preLineObjProg.str("");
     preLineObjProg.clear();
