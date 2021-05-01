@@ -36,6 +36,11 @@ ostringstream preObjectProgram;
 int startingAddress;
 int endingAddress;
 string name;
+ostringstream lineObjProg;
+ostringstream preLineObjProg;
+int lineStartAddress;
+int lineEndAddress;
+int objCodeCounter = 0;
 
 void onePassScan();
 bool isAssemblerDirective(string s);
@@ -50,6 +55,18 @@ string searchInOptab(string s);
 string seachInSymtabForLoc( string temp);
 string returnObjectCodeForAD(string str1, string str2);
 
+void moveToNextLine()
+{
+    //Optimization possible by removing lineObjProg
+    lineObjProg<<"T^"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
+    lineObjProg<<preLineObjProg.str()<<"\n";
+    preLineObjProg.str("");
+    preLineObjProg.clear();
+    preObjectProgram<<lineObjProg.str();
+    lineObjProg.str("");
+    lineObjProg.clear();
+    objCodeCounter = 0;
+}
 
 bool isAssemblerDirective(string s)
 {
@@ -157,21 +174,22 @@ void entersymbol_column3( string temp , string value)
  
 void search_symtab_column1(string symbol, string value)
 {   
-    //string c ="00";
-    //string final;
-     for (int i = 0; i < vSymtab.size(); i++)
+    for (int i = 0; i < vSymtab.size(); i++)
     {
         if(strcmp(vSymtab[i].symbol.c_str() , symbol.c_str())==0)
         {    
             if( vSymtab[i].address == "*")
             {
+                int temp1;
+                istringstream(value)>>hex>>temp1;
+                lineEndAddress = temp1-3;
+                moveToNextLine();
                  struct Node *temp;
                  struct Node *next;
                  temp = vSymtab[i].link;
                  while (temp != NULL)
                  {  
-                   // final = strcat( c , temp->opcode.c_str()) ;
-                    cout<<"T"<<"^"<<temp->notDefinedAddress<<"^"<<value<<endl;
+                    preObjectProgram<<"T"<<"^"<<temp->notDefinedAddress<<"^02^"<<value<<endl;
                     next= temp->link;
                     free(temp);
                     temp = next;
@@ -190,6 +208,7 @@ void onePassScan()
     int loc;
     string line, col1, col2, col3;
     ifstream file("input1.txt");
+    bool afterAssemDir = false;
     
     if(file.is_open())
     {
@@ -242,16 +261,18 @@ void onePassScan()
                         }
                         name = col1;
                         startingAddress = loc;
+                        lineStartAddress = loc;
                         continue;
                     }
                 else if(col2 == "BYTE")
                 {
+                    afterAssemDir = true;
                     if(col3[0] == 'C')
                         loc += 3;
                     else
                         loc += 1;
                     string objCodeForByte = returnObjectCodeForAD(col2, col3);
-                    cout<<objCodeForByte<<endl;
+                    preLineObjProg<<"^"<<objCodeForByte;
                 }
                 else if(col2 == "RESB")
                 {
@@ -261,6 +282,7 @@ void onePassScan()
                 }
                 else if(col2 == "RESW")
                 {
+                    afterAssemDir = true;
                     int temp;
                     istringstream(col3)>>temp;
                     loc += 3*temp;
@@ -269,12 +291,15 @@ void onePassScan()
                 {
                     loc+=3;
                     string objCodeForWord = returnObjectCodeForAD(col2, col3);
-                    cout<<objCodeForWord<<endl;
+                    preLineObjProg<<"^"<<objCodeForWord;
                 }
                 else if(col2 == "END")
                     {
                         loc+=3;
-                        endingAddress = loc;
+                        endingAddress = loc-3;
+                        objectProgram<<"H^"<<name<<"^"<<hex<<startingAddress<<"^"<<hex<<endingAddress-startingAddress<<endl;
+                        objectProgram<<preObjectProgram.str();
+                        objectProgram<<"E^"<<hex<<endingAddress;
                     }
                 else
                     loc+=3;
@@ -295,6 +320,12 @@ void onePassScan()
                     }
                     }
                 loc+=3;
+                if(afterAssemDir)
+                {
+                    lineEndAddress = loc;
+                    moveToNextLine();
+                    afterAssemDir = false;
+                }
             }
             
             
@@ -340,8 +371,18 @@ void onePassScan()
                 }
                 else
                     ObjectCode = opcode + locFromSymtab;
-                cout<<ObjectCode<<endl;
+                preLineObjProg<<"^"<<ObjectCode;
+                if(objCodeCounter == 0)
+                {
+                    lineStartAddress = loc-3;
+                }
+                objCodeCounter++;
             }
+            if(objCodeCounter == 10)
+                {
+                    lineEndAddress = loc;
+                    moveToNextLine();
+                }
         }
 
         file.close();
@@ -421,9 +462,14 @@ string returnObjectCodeForAD(string str1, string str2)
 {
     if(str1 == "WORD")
     {
-        for(int i = str2.size(); i<6 ; i++)
-            str2.insert(0,"0");
-        return str2;
+        int temp2;
+        istringstream(str2)>>temp2;
+        ostringstream temp3;
+        temp3<<hex<<temp2;
+        string temp4 = temp3.str();
+        for(int i = temp4.size(); i<6 ; i++)
+            temp4.insert(0,"0");
+        return temp4;
     }
     else if(str1 == "BYTE")
     {
@@ -450,6 +496,7 @@ int main()
     initOptab();
 
     onePassScan();
+    cout<<objectProgram.str();
     // printlinklist();
     return 0;
 }
