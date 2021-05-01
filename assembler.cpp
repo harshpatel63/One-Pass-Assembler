@@ -462,6 +462,10 @@ void onePassScan()
     }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fd8d6a81d3493eee5100a203f47388e7c7aae837
 void initOptab()
 {
     ifstream fn("optab.txt");
