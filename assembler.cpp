@@ -334,7 +334,7 @@ void onePassScan()
                     ostringstream s;
                     int temp;
                     istringstream(locFromSymtab)>>hex>>temp;
-                    temp *= 9;
+                    temp += 32768;
                     s<<hex<<temp;
                     ObjectCode = opcode + s.str();
                 }
