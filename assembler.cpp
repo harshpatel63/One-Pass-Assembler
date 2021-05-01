@@ -520,14 +520,17 @@ void printMainScreen()
     cout<<"\n\n\n\n\t\t\t\t1. Print the object program to screen"<<endl;
     cout<<"\t\t\t\t2. Store the object program into output.txt in the same directory"<<endl;
     cout<<"\t\t\t\t3. Print the object program to screen and also generate an output.txt file"<<endl;
+    cout<<"\n\n\n\n\t\t\t\tNote : The screen output will contain ^ characters for better readability while the output file will not."<<endl;
     cin>>option;
     string final = objectProgram.str();
     transform(final.begin(),final.end(),final.begin(), ::toupper);
     fstream outputFile;
+    string temp5 = final;
     switch(option)
     {
         case 1:
             cout<<endl<<final<<endl;
+            cin.get();
         break;
         case 2:
             outputFile.open("output.txt",ios::out);
@@ -539,8 +542,10 @@ void printMainScreen()
             }
             else
             {
-                outputFile<<final;
+                temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+                outputFile<<temp5;
                 cout<<"File with object program successfully created..."<<endl;
+                cin.get();
             }
         break;
         case 3:
@@ -551,10 +556,12 @@ void printMainScreen()
             }
             else
             {
-                outputFile<<final;
+                temp5.erase(remove(temp5.begin(), temp5.end(), '^'), temp5.end());
+                outputFile<<temp5;
                 cout<<"\nFile with object program successfully created...\n"<<endl;
             }
             cout<<endl<<final<<endl;
+            cin.get();
         break;
         default:
             cout<<"\n\n\n\n\t\t\t\tThe Option selected does not exist. Press Enter to re-enter.\n\n"<<endl;
