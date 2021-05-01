@@ -35,6 +35,8 @@ ostringstream objectProgram;
 ostringstream preObjectProgram;
 int startingAddress;
 int endingAddress;
+int firstExeAdd;
+bool firstExeAddBool = true;
 string name;
 ostringstream lineObjProg;
 ostringstream preLineObjProg;
@@ -58,6 +60,8 @@ string returnObjectCodeForAD(string str1, string str2);
 void moveToNextLine()
 {
     //Optimization possible by removing lineObjProg
+    if(preLineObjProg.str() == "")
+    return;
     lineObjProg<<"T^"<<hex<<lineStartAddress<<"^"<<hex<<lineEndAddress-lineStartAddress;
     lineObjProg<<preLineObjProg.str()<<"\n";
     preLineObjProg.str("");
@@ -295,14 +299,13 @@ void onePassScan()
                 }
                 else if(col2 == "END")
                     {
-
                         lineEndAddress = loc;
                         moveToNextLine();
                         loc+=3;
                         endingAddress = loc-3;
                         objectProgram<<"H^"<<name<<"^"<<hex<<startingAddress<<"^"<<hex<<endingAddress-startingAddress<<endl;
                         objectProgram<<preObjectProgram.str();
-                        objectProgram<<"E^"<<hex<<endingAddress;
+                        objectProgram<<"E^"<<hex<<firstExeAdd;
                     }
                 else
                     loc+=3;
@@ -313,14 +316,19 @@ void onePassScan()
                 {
                     opcode = searchInOptab(col2);
                 }
-                    catch (int x)
-                    {
+                catch (int x)
+                {
                     if(x == -1)
                     {
                         cout<<"WARNING: The mnemonic code "<<col2<<" is not present in optab."<<endl;
                         cout<<endl<<"Please add the opcode for the respective mnemonic code in optab.txt"<<endl;
                         exit(1);
                     }
+                }
+                if(firstExeAddBool)
+                    {
+                        firstExeAdd = loc;
+                        firstExeAddBool = false;
                     }
                 loc+=3;
                 if(afterAssemDir)
