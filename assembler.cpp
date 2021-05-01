@@ -513,6 +513,57 @@ void printSplashScreen()
     cin.ignore();
     system("CLS");
 }
+void printMainScreen()
+{
+    int option;
+    cout<<"\n\n\n\n\t\t\t\tEnter the desired option to get the output."<<endl;
+    cout<<"\n\n\n\n\t\t\t\t1. Print the object program to screen"<<endl;
+    cout<<"\t\t\t\t2. Store the object program into output.txt in the same directory"<<endl;
+    cout<<"\t\t\t\t3. Print the object program to screen and also generate an output.txt file"<<endl;
+    cin>>option;
+    string final = objectProgram.str();
+    transform(final.begin(),final.end(),final.begin(), ::toupper);
+    fstream outputFile;
+    switch(option)
+    {
+        case 1:
+            cout<<endl<<final<<endl;
+        break;
+        case 2:
+            outputFile.open("output.txt",ios::out);
+            if(!outputFile)
+            {
+                cout<<"File creation failed. Press enter to return to Main Screen"<<endl;
+                cin.ignore();
+                printMainScreen();
+            }
+            else
+            {
+                outputFile<<final;
+                cout<<"File with object program successfully created..."<<endl;
+            }
+        break;
+        case 3:
+            outputFile.open("output.txt",ios::out);
+            if(!outputFile)
+            {
+                cout<<"File creation failed.\n"<<endl;
+            }
+            else
+            {
+                outputFile<<final;
+                cout<<"\nFile with object program successfully created...\n"<<endl;
+            }
+            cout<<endl<<final<<endl;
+        break;
+        default:
+            cout<<"\n\n\n\n\t\t\t\tThe Option selected does not exist. Press Enter to re-enter.\n\n"<<endl;
+            cin.ignore();
+            system("CLS");
+            printMainScreen();
+        break;
+    }
+}
 int main(int argc, char *argv[])
 {
     printSplashScreen();
@@ -527,16 +578,12 @@ int main(int argc, char *argv[])
         filename = "input1.txt";
     }
 
-
-
     initOptab();
 
     onePassScan();
 
+    printMainScreen();
 
-    string final = objectProgram.str();
-    transform(final.begin(),final.end(),final.begin(), ::toupper);
-    cout<<final;
     cin.get();
     return 0;
 }
