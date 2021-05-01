@@ -43,6 +43,7 @@ void entersymbol_column3( string temp , string value);
 void search_symtab_column1(string symbol, string value);
 string searchInOptab(string s);
 string seachInSymtabForLoc( string temp);
+string returnObjectCodeForAD(string str1, string str2);
 
 
 bool isAssemblerDirective(string s)
@@ -183,7 +184,7 @@ void onePassScan()
 {
     int loc;
     string line, col1, col2, col3;
-    ifstream file("input2.txt");
+    ifstream file("input1.txt");
     
     if(file.is_open())
     {
@@ -227,18 +228,28 @@ void onePassScan()
                 if(col2 == "START")
                     istringstream(col3)>>hex>>loc;
                 else if(col2 == "BYTE")//Will have to handle C'EOF' separately here. We'll do it later.
-                    loc += 1;
+                {
+                    loc += 3;
+                    string objCodeForByte = returnObjectCodeForAD(col2, col3);
+                    cout<<objCodeForByte<<endl;
+                }
                 else if(col2 == "RESB")
                 {
                     int temp;
-                    istringstream(col3)>>hex>>temp;
+                    istringstream(col3)>>temp;
                     loc += 1*temp;
                 }
                 else if(col2 == "RESW")
-                    {
+                {
                     int temp;
-                    istringstream(col3)>>hex>>temp;
+                    istringstream(col3)>>temp;
                     loc += 3*temp;
+                }
+                else if(col2 == "WORD")
+                {
+                    loc+=3;
+                    string objCodeForWord = returnObjectCodeForAD(col2, col3);
+                    cout<<objCodeForWord<<endl;
                 }
                 else
                     loc+=3;
@@ -286,14 +297,11 @@ void onePassScan()
 
             if(!isAssemblerDirective(col2)) //It was col2 != "START" before
             {
-             entersymbol_column3(col3 , push);
+                entersymbol_column3(col3 , push);
+                locFromSymtab = seachInSymtabForLoc(col3);
+                ObjectCode = opcode + locFromSymtab;
+                cout<<ObjectCode<<endl;
             }
-
-           locFromSymtab = seachInSymtabForLoc( col3);
-           ObjectCode = opcode + locFromSymtab;
-      
-           cout<<ObjectCode<<endl; 
-           
         }
 
         file.close();
@@ -368,6 +376,34 @@ string seachInSymtabForLoc( string temp)
         }
     }
     return "0000";
+}
+string returnObjectCodeForAD(string str1, string str2)
+{
+    if(str1 == "WORD")
+    {
+        for(int i = str2.size(); i<6 ; i++)
+            str2.insert(0,"0");
+        return str2;
+    }
+    else if(str1 == "BYTE")
+    {
+        if(str2[0] == 'C')
+        {
+            ostringstream os;
+            string temp = str2.substr(2,str2.size()-3);
+            for(int i = 0;i< temp.size();i++)
+            {
+                int t = temp[i];
+                os<<hex<<t;
+            }
+            return os.str();
+        }
+        else if(str2[0] == 'X')
+        {
+            return str2.substr(2,str2.size()-3);
+        }
+    }
+    return "000000";
 }
 int main()
 {
