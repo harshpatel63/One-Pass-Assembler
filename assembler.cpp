@@ -501,8 +501,21 @@ string returnObjectCodeForAD(string str1, string str2)
     }
     return "000000";
 }
+void printSplashScreen()
+{
+    cout<<"\n\n\n\n\t\t\t\tNational Institute of Technology Goa"<<endl;
+    cout<<"\n\n\n\n\t\t\t\tOne Pass Assembler that generates object program\n\n"<<endl;
+    cout<<"\t\t\t\tCode by:\n"<<endl;
+    cout<<"\t\t\t\tGroup No.: 4"<<endl;
+    cout<<"\t\t\t\t1. Roshan Kumar - 19CSE1027"<<endl;
+    cout<<"\t\t\t\t2. Patel Harsh Rajesh - 19CSE1019"<<endl;
+    cout<<"\t\t\t\tEnter Enter key to continue..."<<endl;
+    cin.ignore();
+    system("CLS");
+}
 int main(int argc, char *argv[])
 {
+    printSplashScreen();
 
     if(argc == 2)
     {
@@ -514,12 +527,16 @@ int main(int argc, char *argv[])
         filename = "input1.txt";
     }
 
+
+
     initOptab();
 
     onePassScan();
+
+
     string final = objectProgram.str();
     transform(final.begin(),final.end(),final.begin(), ::toupper);
     cout<<final;
-    // printlinklist();
+    cin.get();
     return 0;
 }
