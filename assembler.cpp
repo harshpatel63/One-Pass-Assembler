@@ -1,3 +1,14 @@
+/*
+*   Project : One Pass Assembler that generates object program.
+*   
+*   Group No : 4
+*   
+*   Name of members : Roshan Kumar (19CSE1027)
+*                     Patel Harsh Rajesh (19CSE1019)
+*
+*   For instructions on how to use it, kindly refer the Readme.txt file.
+*/
+
 #include<iostream>
 #include<fstream>
 #include<vector>
@@ -35,33 +46,64 @@ vector<string> location;
 vector<Optab> vOptab;
 ostringstream objectProgram;
 ostringstream preObjectProgram;
+ostringstream lineObjProg;
+ostringstream preLineObjProg;
+string filename;
+string name;
 int startingAddress;
 int endingAddress;
 int firstExeAdd;
-bool firstExeAddBool = true;
-string name;
-ostringstream lineObjProg;
-ostringstream preLineObjProg;
 int lineStartAddress;
 int objCodeCounter = 0;
+bool firstExeAddBool = true;
 
+void initOptab();
+void printSplashScreen();
 void onePassScan();
-bool isAssemblerDirective(string s);
+void printMainScreen();
+void enterSymbolInColumn1( string temp , string value);
+void enterSymbolInColumn3( string temp , string value);
+void searchSymtabForColumn1(string symbol, string value);
+void enterExtra(struct Node *link , string value , int i);
+void moveToNextLine();
 int searchSymtab(string temp);
-
-void enterextra(struct Node *link , string value , int i);
-int return_index( string temp);
-void entersymbol_column1( string temp , string value);
-void entersymbol_column3( string temp , string value);
-void search_symtab_column1(string symbol, string value);
+int returnIndex( string temp);
+bool isAssemblerDirective(string s);
 string searchInOptab(string s);
 string seachInSymtabForLoc( string temp);
 string returnObjectCodeForAD(string str1, string str2);
-string filename;
+
+
+int main(int argc, char *argv[])
+{
+    printSplashScreen();
+
+    if(argc == 2)
+    {
+        filename = argv[1];
+    }
+    else
+    {
+        //If there isn't any input text file from the command line, it will consider input1.txt provided.
+        cout<<endl<<"Your filename is not proper... Running the default file input1.txt\n"<<endl;
+        filename = "input1.txt";
+    }
+
+    initOptab();
+
+    onePassScan();
+
+    printMainScreen();
+
+    cin.get();
+
+    return 0;
+}
+
+
 
 void moveToNextLine()
 {
-    //Optimization possible by removing lineObjProg
     if(preLineObjProg.str() == "")
     return;
     string temp5 = preLineObjProg.str();
@@ -79,6 +121,7 @@ void moveToNextLine()
 
 bool isAssemblerDirective(string s)
 {
+    //Checks whether string s is an Assembler Directive or not.
     for(int i = 0; i<assemblerDirectives.size(); i++)
     {
         if(s == assemblerDirectives[i])
@@ -87,8 +130,9 @@ bool isAssemblerDirective(string s)
     return false;
 }
 
-void enterextra(struct Node *link , string value , int i)
+void enterExtra(struct Node *link , string value , int i)
 {
+    //This Function creates link to the linked list used in symtab.
    if (link == NULL)
    {  
        struct Node *head ;
@@ -137,7 +181,7 @@ int searchSymtab( string temp)
     
 }
 
-int return_index( string temp)
+int returnIndex( string temp)
 {
     for (int i = 0; i < vSymtab.size(); i++)
     {
@@ -148,7 +192,7 @@ int return_index( string temp)
     }
 }
 
-void entersymbol_column1( string temp , string value)
+void enterSymbolInColumn1( string temp , string value)
 {   
     struct Symtab s;
     s.symbol = temp;
@@ -157,7 +201,7 @@ void entersymbol_column1( string temp , string value)
     vSymtab.push_back(s);
 }
 
-void entersymbol_column3( string temp , string value)
+void enterSymbolInColumn3( string temp , string value)
 {   
     
     struct Symtab s;
@@ -166,8 +210,8 @@ void entersymbol_column3( string temp , string value)
         if(searchSymtab(temp))
         {  
         int i;
-        i = return_index(temp);
-        enterextra(vSymtab[i].link , value , i);
+        i = returnIndex(temp);
+        enterExtra(vSymtab[i].link , value , i);
         }
         else
         {  
@@ -176,12 +220,12 @@ void entersymbol_column3( string temp , string value)
            s.address = "*";
            s.link = NULL;
            vSymtab.push_back(s);
-           i = return_index(temp);
-           enterextra( s.link , value , i);
+           i = returnIndex(temp);
+           enterExtra( s.link , value , i);
           }
 }
  
-void search_symtab_column1(string symbol, string value)
+void searchSymtabForColumn1(string symbol, string value)
 {   
     for (int i = 0; i < vSymtab.size(); i++)
     {
@@ -202,7 +246,7 @@ void search_symtab_column1(string symbol, string value)
                  }
                  
                  vSymtab.erase( vSymtab.begin() + i);
-                 entersymbol_column1(symbol , value);
+                 enterSymbolInColumn1(symbol , value);
                  
             }
         }
@@ -211,6 +255,9 @@ void search_symtab_column1(string symbol, string value)
 
 void onePassScan()
 {
+    //The Prime function of the C++ program.
+    //It scans the input file line by line and does the related job
+    // of location incrementation, getting object code and many more.
     int loc;
     string line, col1, col2, col3;
     ifstream file(filename);
@@ -251,6 +298,8 @@ void onePassScan()
                 location.push_back(push);
             if(lineReverse.substr(0,4) == "BUSR")
             {
+                //We had to handle RSUB in this way only.
+                //Since, the column 3 for RSUB doesn't existed.
                 loc+=3;
                 opcode = searchInOptab("RSUB");
                 ObjectCode = opcode + "0000";
@@ -276,7 +325,6 @@ void onePassScan()
                         istringstream(col3)>>hex>>loc;
                         for(int i = col1.size();i<6;i++)
                         {
-                            //Optimization possible...
                             col1.append(" ");
                         }
                         name = col1;
@@ -329,6 +377,7 @@ void onePassScan()
             {  
                 try
                 {
+                    //Error Handling for if the opcode is not mentioned in the optab.txt file.
                     opcode = searchInOptab(col2);
                 }
                 catch (int x)
@@ -361,16 +410,16 @@ void onePassScan()
             { 
                  if (searchSymtab(col1))
                  {  
-                    search_symtab_column1( col1 , push);
+                    searchSymtabForColumn1( col1 , push);
                  }
                  else
                  {
-                     entersymbol_column1( col1 , push);
+                     enterSymbolInColumn1( col1 , push);
                  }
                  
             }
 
-            if(!isAssemblerDirective(col2)) //It was col2 != "START" before
+            if(!isAssemblerDirective(col2))
             {
                 if(col3[col3.size()-1] == 'X' && col3[col3.size()-2] == ',')
                 {
@@ -382,7 +431,7 @@ void onePassScan()
                 temp+=1;
                 ostringstream t;
                 t<<hex<<temp;
-                entersymbol_column3(col3 , t.str());
+                enterSymbolInColumn3(col3 , t.str());
                 locFromSymtab = seachInSymtabForLoc(col3);
                 if (isIndexAdd)
                 {
@@ -412,34 +461,7 @@ void onePassScan()
         file.close();
     }
 }
-void printsymtab()
-{
-    for (int i = 0; i < vSymtab.size(); i++)
-    {
-        cout<<vSymtab[i].symbol<<" ";
-        cout<<vSymtab[i].address<<endl;
-    }
-    
-}
 
-void printlinklist( )
-{
-    for(int i =0 ; i < vSymtab.size() ; i++)
-    {
-        if(vSymtab[i].address == "*")
-        {   
-            cout<<"\n link list for"<<vSymtab[i].symbol;
-            struct Node *temp;
-            temp = vSymtab[i].link;
-            while (temp != NULL)
-            {
-                cout<<temp->notDefinedAddress<<" ";
-                temp = temp->link;
-            }
-            
-        }
-    }
-}
 void initOptab()
 {
     ifstream fn("optab.txt");
@@ -584,27 +606,4 @@ void printMainScreen()
             printMainScreen();
         break;
     }
-}
-int main(int argc, char *argv[])
-{
-    printSplashScreen();
-
-    if(argc == 2)
-    {
-        filename = argv[1];
-    }
-    else
-    {
-        cout<<endl<<"Your filename is not proper... Running the default file input1.txt\n"<<endl;
-        filename = "input1.txt";
-    }
-
-    initOptab();
-
-    onePassScan();
-
-    printMainScreen();
-
-    cin.get();
-    return 0;
 }
