@@ -412,34 +412,8 @@ void onePassScan()
         file.close();
     }
 }
-void printsymtab()
-{
-    for (int i = 0; i < vSymtab.size(); i++)
-    {
-        cout<<vSymtab[i].symbol<<" ";
-        cout<<vSymtab[i].address<<endl;
-    }
-    
-}
 
-void printlinklist( )
-{
-    for(int i =0 ; i < vSymtab.size() ; i++)
-    {
-        if(vSymtab[i].address == "*")
-        {   
-            cout<<"\n link list for"<<vSymtab[i].symbol;
-            struct Node *temp;
-            temp = vSymtab[i].link;
-            while (temp != NULL)
-            {
-                cout<<temp->notDefinedAddress<<" ";
-                temp = temp->link;
-            }
-            
-        }
-    }
-}
+
 void initOptab()
 {
     ifstream fn("optab.txt");
